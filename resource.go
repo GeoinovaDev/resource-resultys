@@ -18,46 +18,46 @@ type Resource struct {
 
 // New cria o ralloc
 func New(limit int) *Resource {
-	channel := &Resource{Limit: limit}
+	resource := &Resource{Limit: limit}
 
-	channel.mutex = &sync.Mutex{}
-	channel.fila = queue.New()
+	resource.mutex = &sync.Mutex{}
+	resource.fila = queue.New()
 
-	return channel
+	return resource
 }
 
-// Alloc aloca canal de comunicação
-func (channel *Resource) Alloc(callback func()) *Resource {
-	channel.mutex.Lock()
+// Alloc aloca resource
+func (resource *Resource) Alloc(callback func()) *Resource {
+	resource.mutex.Lock()
 
-	if channel.used == channel.Limit {
-		channel.fila.Push(item{cb: callback})
-		channel.mutex.Unlock()
-		return channel
+	if resource.used == resource.Limit {
+		resource.fila.Push(item{cb: callback})
+		resource.mutex.Unlock()
+		return resource
 	}
 
-	channel.used++
-	channel.mutex.Unlock()
+	resource.used++
+	resource.mutex.Unlock()
 
 	callback()
 
-	channel.Release()
+	resource.Release()
 
-	return channel
+	return resource
 }
 
-// Release libera o canal
-func (channel *Resource) Release() *Resource {
-	channel.mutex.Lock()
-	channel.used--
-	channel.mutex.Unlock()
+// Release libera o resource
+func (resource *Resource) Release() *Resource {
+	resource.mutex.Lock()
+	resource.used--
+	resource.mutex.Unlock()
 
-	if channel.fila.IsEmpty() {
-		return channel
+	if resource.fila.IsEmpty() {
+		return resource
 	}
 
-	item := channel.fila.Pop().(item)
-	channel.Alloc(item.cb)
+	item := resource.fila.Pop().(item)
+	resource.Alloc(item.cb)
 
-	return channel
+	return resource
 }
