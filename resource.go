@@ -3,7 +3,7 @@ package resource
 import (
 	"sync"
 
-	"git.resultys.com.br/lib/lower/collection/queue"
+	"github.com/GeoinovaDev/lower-resultys/collection/queue"
 )
 
 // Resource struct
